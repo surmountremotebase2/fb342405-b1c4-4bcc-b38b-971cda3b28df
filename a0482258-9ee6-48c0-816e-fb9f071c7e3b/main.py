@@ -7,19 +7,13 @@ class TradingStrategy(Strategy):
 
     def __init__(self):
         self.tickers = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
-        # Initialize data sources one at a time to avoid caching issues
+        # Initialize data sources following the documented pattern
         self.data_list = []
-        
-        # Add data sources individually with error handling
-        for ticker in self.tickers:
-            try:
-                self.data_list.append(InsiderTrading(ticker))
-                self.data_list.append(InstitutionalOwnership(ticker))
-                self.data_list.append(SocialSentiment(ticker))
-                self.data_list.append(Ratios(ticker))
-            except Exception as e:
-                log(f"Error initializing data sources for {ticker}: {str(e)}")
-                continue
+        # Initialize each data source type separately
+        self.data_list = [InsiderTrading(ticker) for ticker in self.tickers]
+        self.data_list.extend([InstitutionalOwnership(ticker) for ticker in self.tickers])
+        self.data_list.extend([SocialSentiment(ticker) for ticker in self.tickers])
+        self.data_list.extend([Ratios(ticker) for ticker in self.tickers])
 
     @property
     def interval(self):
