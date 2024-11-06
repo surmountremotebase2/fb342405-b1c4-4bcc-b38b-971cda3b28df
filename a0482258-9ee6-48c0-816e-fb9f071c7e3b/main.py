@@ -1,11 +1,11 @@
 from surmount.base_class import Strategy, TargetAllocation
 from surmount.logging import log
 from surmount.technical_indicators import RSI, VWAP, ATR, SMA
+from datetime import datetime
 
 class TradingStrategy(Strategy):
     def __init__(self):
-        # Focus on just SPY for maximum liquidity
-        self.tickers = ["SPY"]
+        self.tickers = ["SPY", "QQQ"]
         self.max_position = 0.25
         
     @property
@@ -18,7 +18,7 @@ class TradingStrategy(Strategy):
 
     @property
     def data(self):
-        return []  # Simplified to avoid database issues
+        return []  # No additional data sources needed
 
     def run(self, data):
         allocation_dict = {ticker: 0 for ticker in self.tickers}
@@ -64,5 +64,10 @@ class TradingStrategy(Strategy):
             except Exception as e:
                 log(f"Error processing {ticker}: {str(e)}")
                 continue
+        
+        # Portfolio-level risk management
+        total_allocation = sum(allocation_dict.values())
+        if total_allocation > 1:
+            allocation_dict = {k: v/total_allocation for k, v in allocation_dict.items()}
         
         return TargetAllocation(allocation_dict)
