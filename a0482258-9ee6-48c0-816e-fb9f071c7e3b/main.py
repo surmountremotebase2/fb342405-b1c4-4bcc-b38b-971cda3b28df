@@ -7,14 +7,14 @@ class TradingStrategy(Strategy):
 
     def __init__(self):
         self.tickers = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
+        # Initialize data sources one by one for each ticker
         self.data_list = []
         for ticker in self.tickers:
-            self.data_list.extend([
-                InsiderTrading(ticker),
-                InstitutionalOwnership(ticker),
-                SocialSentiment(ticker),
-                Ratios(ticker)
-            ])
+            # Add data sources individually to better handle potential failures
+            self.data_list.append(InsiderTrading(ticker))
+            self.data_list.append(InstitutionalOwnership(ticker))
+            self.data_list.append(SocialSentiment(ticker))
+            self.data_list.append(Ratios(ticker))
 
     @property
     def interval(self):
