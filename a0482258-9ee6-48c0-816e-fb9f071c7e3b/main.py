@@ -33,11 +33,11 @@ class TradingStrategy(Strategy):
 
         for ticker in self.tickers:
             # Get data for the ticker
-            insider_trades = data.get(("insider_trading", ticker), [])
-            institutional_data = data.get(("institutional_ownership", ticker), {})
-            social_data = data.get(("social_sentiment", ticker), {})
-            ratios_data = data.get(("ratios", ticker), {})
-            ticker_ohlcv = [item[ticker] for item in ohlcv_data if ticker in item]
+            insider_trades = data[InsiderTrading(ticker)]
+            institutional_data = data[InstitutionalOwnership(ticker)][-1]  # Latest data point
+            social_data = data[SocialSentiment(ticker)][-1]
+            ratios_data = data[Ratios(ticker)][-1]
+            ticker_ohlcv = data["ohlcv"]  # This already contains the properly formatted OHLCV data
 
             # Check for recent insider buying
             recent_buy = False
@@ -48,10 +48,10 @@ class TradingStrategy(Strategy):
                         break
 
             # Check for high institutional ownership
-            inst_ownership_percent = institutional_data.get("ownershipPercent", 0)
+            inst_ownership_percent = institutional_data.get("ownershipPercentage", 0)
 
             # Check for positive social sentiment
-            twitter_sentiment = social_data.get("twitterSentiment", 0)
+            twitter_sentiment = social_data.get("averageSentiment", 0)
             stocktwits_sentiment = social_data.get("stocktwitsSentiment", 0)
             avg_sentiment = (twitter_sentiment + stocktwits_sentiment) / 2
 
